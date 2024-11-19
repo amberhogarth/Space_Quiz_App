@@ -2,6 +2,7 @@ package au.edu.jcu.spacequizapp.needed
 
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import au.edu.jcu.spacequizapp.R
@@ -31,20 +32,44 @@ class QuizActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupQuizButtons(quizzes: List<Quiz>) {
-        Log.d("QuizActivity", "Quizzes loaded: ${quizzes.size}")
-        for (quiz in quizzes) {
-            val button = Button(this).apply {
-                text = quiz.title
-                setOnClickListener {
-                    val fragment = QuizFragment.newInstance(quiz.quizId)
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.quizListContainer, fragment)
-                        .addToBackStack(null)
-                        .commit()
-                }
+//    private fun setupQuizButtons(quizzes: List<Quiz>) {
+//        Log.d("QuizActivity", "Quizzes loaded: ${quizzes.size}")
+//        for (quiz in quizzes) {
+//            val button = Button(this).apply {
+//                text = quiz.title
+//                setOnClickListener {
+//                    val fragment = QuizFragment.newInstance(quiz.quizId)
+//                    supportFragmentManager.beginTransaction()
+//                        .replace(R.id.quizListContainer, fragment)
+//                        .addToBackStack(null)
+//                        .commit()
+//                }
+//            }
+//            binding.quizListContainer.addView(button)
+//        }
+//    }
+private fun setupQuizButtons(quizzes: List<Quiz>) {
+    Log.d("QuizActivity", "Quizzes loaded: ${quizzes.size}")
+    val inflater = LayoutInflater.from(this)
+
+    for (quiz in quizzes) {
+        // Inflate the custom quiz button layout
+        val buttonView = inflater.inflate(R.layout.item_quiz_button, binding.quizListContainer, false)
+
+        // Customize the button using the inflated layout
+        buttonView.findViewById<Button>(R.id.quiz_button).apply {
+            text = quiz.title // Set the text to the quiz title
+            setOnClickListener {
+                val fragment = QuizFragment.newInstance(quiz.quizId)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.quizListContainer, fragment)
+                    .addToBackStack(null)
+                    .commit()
             }
-            binding.quizListContainer.addView(button)
         }
+
+        // Add the customized button to the container
+        binding.quizListContainer.addView(buttonView)
     }
+}
 }

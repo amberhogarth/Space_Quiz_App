@@ -5,6 +5,46 @@
     android:orientation="vertical"
     android:background="@color/blue_purple">
 
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="AR View"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:padding="24dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Click to go to AR View"
+        android:padding="10dp"
+
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Quizzes"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        android:padding="24dp"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:text="Unlock planets by completing quizzes here!"
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        android:padding="5dp"
+        />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
