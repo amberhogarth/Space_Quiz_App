@@ -32,22 +32,6 @@ class QuizActivity : AppCompatActivity() {
         }
     }
 
-//    private fun setupQuizButtons(quizzes: List<Quiz>) {
-//        Log.d("QuizActivity", "Quizzes loaded: ${quizzes.size}")
-//        for (quiz in quizzes) {
-//            val button = Button(this).apply {
-//                text = quiz.title
-//                setOnClickListener {
-//                    val fragment = QuizFragment.newInstance(quiz.quizId)
-//                    supportFragmentManager.beginTransaction()
-//                        .replace(R.id.quizListContainer, fragment)
-//                        .addToBackStack(null)
-//                        .commit()
-//                }
-//            }
-//            binding.quizListContainer.addView(button)
-//        }
-//    }
 private fun setupQuizButtons(quizzes: List<Quiz>) {
     Log.d("QuizActivity", "Quizzes loaded: ${quizzes.size}")
     val inflater = LayoutInflater.from(this)

@@ -32,14 +32,12 @@ class QuizFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        // Existing code
         quizId = arguments?.getInt(ARG_QUIZ_ID)
         val db = AppDatabase.getDatabase(requireContext())
         questionDao = db.questionDao()
 
         quizId?.let { loadQuestions(it) }
 
-        // New code to handle back button click
         binding.closeQuizButton.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
         }
