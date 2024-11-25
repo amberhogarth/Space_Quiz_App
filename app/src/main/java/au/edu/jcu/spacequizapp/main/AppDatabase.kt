@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [Quiz::class, Question::class], version = 5, exportSchema = false)
+@Database(entities = [Quiz::class, Question::class], version = 6, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun quizDao(): QuizDao
     abstract fun questionDao(): QuestionDao
@@ -46,11 +46,11 @@ abstract class AppDatabase : RoomDatabase() {
         suspend fun populateDatabase(quizDao: QuizDao, questionDao: QuestionDao) {
             // Sample data for each celestial body
             val quizzes = listOf(
-                Quiz(title = "Sun Quiz"),
+                Quiz(title = "Earth Quiz"),
                 Quiz(title = "Moon Quiz"),
+                Quiz(title = "Sun Quiz"),
                 Quiz(title = "Mercury Quiz"),
                 Quiz(title = "Venus Quiz"),
-                Quiz(title = "Earth Quiz"),
                 Quiz(title = "Mars Quiz"),
                 Quiz(title = "Jupiter Quiz"),
                 Quiz(title = "Saturn Quiz"),
@@ -62,17 +62,17 @@ abstract class AppDatabase : RoomDatabase() {
                 val quizId = quizDao.insert(quiz).toInt()
 
                 val questions = when (quiz.title) {
-                    "Sun Quiz" -> listOf(
-                        Question(quizId = quizId, questionText = "What color is the Sun?", correctAnswer = "Yellow", optionTwo = "Blue", optionThree = "Green"),
-                        Question(quizId = quizId, questionText = "What is the Sun made of?", correctAnswer = "Hydrogen and Helium", optionTwo = "Rock", optionThree = "Ice"),
-                        Question(quizId = quizId, questionText = "How old is the Sun?", correctAnswer = "4.6 billion years", optionTwo = "1 million years", optionThree = "10 billion years"),
-                        Question(quizId = quizId, questionText = "What type of star is the Sun?", correctAnswer = "G-type", optionTwo = "A-type", optionThree = "M-type"),
-                        Question(quizId = quizId, questionText = "How many planets orbit the Sun?", correctAnswer = "8", optionTwo = "5", optionThree = "12"),
-                        Question(quizId = quizId, questionText = "What is the surface temperature of the Sun?", correctAnswer = "5,500°C", optionTwo = "100°C", optionThree = "10,000°C"),
-                        Question(quizId = quizId, questionText = "Does the Sun have any solid surface?", correctAnswer = "No", optionTwo = "Yes", optionThree = "Sometimes"),
-                        Question(quizId = quizId, questionText = "What is the Sun’s core primarily made of?", correctAnswer = "Hydrogen", optionTwo = "Iron", optionThree = "Oxygen"),
-                        Question(quizId = quizId, questionText = "What is solar wind?", correctAnswer = "Stream of particles", optionTwo = "Sound wave", optionThree = "Ocean current"),
-                        Question(quizId = quizId, questionText = "Which planet is closest to the Sun?", correctAnswer = "Mercury", optionTwo = "Venus", optionThree = "Earth")
+                    "Earth Quiz" -> listOf(
+                        Question(quizId = quizId, questionText = "What percentage of Earth’s surface is covered by water?", correctAnswer = "71%", optionTwo = "50%", optionThree = "85%"),
+                        Question(quizId = quizId, questionText = "How old is Earth?", correctAnswer = "4.5 billion years", optionTwo = "2 million years", optionThree = "10 billion years"),
+                        Question(quizId = quizId, questionText = "What layer of Earth do we live on?", correctAnswer = "Crust", optionTwo = "Mantle", optionThree = "Core"),
+                        Question(quizId = quizId, questionText = "What is Earth’s atmosphere mainly made of?", correctAnswer = "Nitrogen", optionTwo = "Oxygen", optionThree = "Carbon Dioxide"),
+                        Question(quizId = quizId, questionText = "How many continents are on Earth?", correctAnswer = "7", optionTwo = "5", optionThree = "10"),
+                        Question(quizId = quizId, questionText = "What is the largest ocean on Earth?", correctAnswer = "Pacific Ocean", optionTwo = "Atlantic Ocean", optionThree = "Indian Ocean"),
+                        Question(quizId = quizId, questionText = "Does Earth have a magnetic field?", correctAnswer = "Yes", optionTwo = "No", optionThree = "Only at the poles"),
+                        Question(quizId = quizId, questionText = "What causes day and night on Earth?", correctAnswer = "Earth’s rotation", optionTwo = "Earth’s orbit", optionThree = "Moon’s phases"),
+                        Question(quizId = quizId, questionText = "How long does it take Earth to orbit the Sun?", correctAnswer = "365.25 days", optionTwo = "30 days", optionThree = "1000 days"),
+                        Question(quizId = quizId, questionText = "What is Earth’s closest natural neighbor in space?", correctAnswer = "The Moon", optionTwo = "Mars", optionThree = "Venus")
                     )
                     "Moon Quiz" -> listOf(
                         Question(quizId = quizId, questionText = "How long does it take the Moon to orbit Earth?", correctAnswer = "27.3 days", optionTwo = "30 days", optionThree = "365 days"),
@@ -85,6 +85,18 @@ abstract class AppDatabase : RoomDatabase() {
                         Question(quizId = quizId, questionText = "How many moons does Earth have?", correctAnswer = "1", optionTwo = "2", optionThree = "5"),
                         Question(quizId = quizId, questionText = "Does the Moon have water?", correctAnswer = "Yes, in ice form", optionTwo = "Only liquid water", optionThree = "No water"),
                         Question(quizId = quizId, questionText = "What is the dark side of the Moon?", correctAnswer = "The side we never see", optionTwo = "A special area", optionThree = "A brighter area")
+                    )
+                    "Sun Quiz" -> listOf(
+                        Question(quizId = quizId, questionText = "What color is the Sun?", correctAnswer = "Yellow", optionTwo = "Blue", optionThree = "Green"),
+                        Question(quizId = quizId, questionText = "What is the Sun made of?", correctAnswer = "Hydrogen and Helium", optionTwo = "Rock", optionThree = "Ice"),
+                        Question(quizId = quizId, questionText = "How old is the Sun?", correctAnswer = "4.6 billion years", optionTwo = "1 million years", optionThree = "10 billion years"),
+                        Question(quizId = quizId, questionText = "What type of star is the Sun?", correctAnswer = "G-type", optionTwo = "A-type", optionThree = "M-type"),
+                        Question(quizId = quizId, questionText = "How many planets orbit the Sun?", correctAnswer = "8", optionTwo = "5", optionThree = "12"),
+                        Question(quizId = quizId, questionText = "What is the surface temperature of the Sun?", correctAnswer = "5,500°C", optionTwo = "100°C", optionThree = "10,000°C"),
+                        Question(quizId = quizId, questionText = "Does the Sun have any solid surface?", correctAnswer = "No", optionTwo = "Yes", optionThree = "Sometimes"),
+                        Question(quizId = quizId, questionText = "What is the Sun’s core primarily made of?", correctAnswer = "Hydrogen", optionTwo = "Iron", optionThree = "Oxygen"),
+                        Question(quizId = quizId, questionText = "What is solar wind?", correctAnswer = "Stream of particles", optionTwo = "Sound wave", optionThree = "Ocean current"),
+                        Question(quizId = quizId, questionText = "Which planet is closest to the Sun?", correctAnswer = "Mercury", optionTwo = "Venus", optionThree = "Earth")
                     )
                     "Mercury Quiz" -> listOf(
                         Question(quizId = quizId, questionText = "How close is Mercury to the Sun?", correctAnswer = "Closest planet", optionTwo = "Third closest", optionThree = "Second closest"),
@@ -110,19 +122,6 @@ abstract class AppDatabase : RoomDatabase() {
                         Question(quizId = quizId, questionText = "Who is Venus named after?", correctAnswer = "Roman goddess of love", optionTwo = "Greek hero", optionThree = "Famous scientist"),
                         Question(quizId = quizId, questionText = "Is Venus the hottest planet in our solar system?", correctAnswer = "Yes", optionTwo = "No", optionThree = "Only sometimes")
                     )
-
-                    "Earth Quiz" -> listOf(
-                            Question(quizId = quizId, questionText = "What percentage of Earth’s surface is covered by water?", correctAnswer = "71%", optionTwo = "50%", optionThree = "85%"),
-                            Question(quizId = quizId, questionText = "How old is Earth?", correctAnswer = "4.5 billion years", optionTwo = "2 million years", optionThree = "10 billion years"),
-                            Question(quizId = quizId, questionText = "What layer of Earth do we live on?", correctAnswer = "Crust", optionTwo = "Mantle", optionThree = "Core"),
-                            Question(quizId = quizId, questionText = "What is Earth’s atmosphere mainly made of?", correctAnswer = "Nitrogen", optionTwo = "Oxygen", optionThree = "Carbon Dioxide"),
-                            Question(quizId = quizId, questionText = "How many continents are on Earth?", correctAnswer = "7", optionTwo = "5", optionThree = "10"),
-                            Question(quizId = quizId, questionText = "What is the largest ocean on Earth?", correctAnswer = "Pacific Ocean", optionTwo = "Atlantic Ocean", optionThree = "Indian Ocean"),
-                            Question(quizId = quizId, questionText = "Does Earth have a magnetic field?", correctAnswer = "Yes", optionTwo = "No", optionThree = "Only at the poles"),
-                            Question(quizId = quizId, questionText = "What causes day and night on Earth?", correctAnswer = "Earth’s rotation", optionTwo = "Earth’s orbit", optionThree = "Moon’s phases"),
-                            Question(quizId = quizId, questionText = "How long does it take Earth to orbit the Sun?", correctAnswer = "365.25 days", optionTwo = "30 days", optionThree = "1000 days"),
-                            Question(quizId = quizId, questionText = "What is Earth’s closest natural neighbor in space?", correctAnswer = "The Moon", optionTwo = "Mars", optionThree = "Venus")
-                        )
 
                     "Mars Quiz" -> listOf(
                             Question(quizId = quizId, questionText = "What is Mars often called?", correctAnswer = "The Red Planet", optionTwo = "Blue Planet", optionThree = "Green Planet"),

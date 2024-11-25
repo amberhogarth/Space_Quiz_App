@@ -77,4 +77,5 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     implementation ("io.github.sceneview:arsceneview:0.10.0")
+    implementation("com.google.ar:core:1.31.0")
 }

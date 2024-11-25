@@ -6,6 +6,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
@@ -31,13 +34,56 @@ class QuizActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             val quizzes = quizDao.getAllQuizzes()
             withContext(Dispatchers.Main) {
-                setupQuizButtons(quizzes)
+                setupQuizSpinner(quizzes)
+                updateScoreDisplay()
             }
         }
 
         // Link the Toolbar
         val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar) // Set as the ActionBar
+        setSupportActionBar(toolbar)
+
+
+    }
+
+    private fun setupQuizSpinner(quizzes: List<Quiz>) {
+        val spinner = binding.quizSpinner
+
+        // Create an adapter for the spinner
+        val quizTitles = quizzes.map { it.title }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, quizTitles)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+
+        // Set an item selected listener for the spinner
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parentView: AdapterView<*>?,
+                selectedItemView: View?,
+                position: Int,
+                id: Long
+            ) {
+                val selectedQuiz = quizzes[position]
+                displayQuizQuestions(selectedQuiz)
+            }
+
+            override fun onNothingSelected(parentView: AdapterView<*>?) {
+            }
+        }
+    }
+
+    private fun updateScoreDisplay() {
+        val overallScore = intent.getIntExtra("overallScore", 0)
+        binding.userScoreTextView.text = "Score: $overallScore"
+    }
+
+
+    private fun displayQuizQuestions(quiz: Quiz) {
+        val fragment = QuizFragment.newInstance(quiz.quizId)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.quizListContainer, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -52,36 +98,13 @@ class QuizActivity : AppCompatActivity() {
                 return true
             }
             R.id.action_ar -> {
-                val intent = Intent(this, ARActivity::class.java)
-                startActivity(intent)
+                val arIntent = Intent(this, ARActivity::class.java)
+                val overallScore = intent.getIntExtra("overallScore", 0)
+                arIntent.putExtra("overallScore", overallScore)
+                startActivity(arIntent)
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
     }
-
-private fun setupQuizButtons(quizzes: List<Quiz>) {
-    Log.d("QuizActivity", "Quizzes loaded: ${quizzes.size}")
-    val inflater = LayoutInflater.from(this)
-
-    for (quiz in quizzes) {
-        // Inflate the custom quiz button layout
-        val buttonView = inflater.inflate(R.layout.item_quiz_button, binding.quizListContainer, false)
-
-        // Customize the button using the inflated layout
-        buttonView.findViewById<Button>(R.id.quiz_button).apply {
-            text = quiz.title // Set the text to the quiz title
-            setOnClickListener {
-                val fragment = QuizFragment.newInstance(quiz.quizId)
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.quizListContainer, fragment)
-                    .addToBackStack(null)
-                    .commit()
-            }
-        }
-
-        // Add the customized button to the container
-        binding.quizListContainer.addView(buttonView)
-    }
-}
 }

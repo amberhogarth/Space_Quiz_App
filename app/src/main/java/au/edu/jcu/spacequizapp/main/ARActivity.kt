@@ -14,6 +14,7 @@ import io.github.sceneview.math.Position
 import android.media.MediaPlayer
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import au.edu.jcu.spacequizapp.R
 import io.github.sceneview.ar.node.PlacementMode
@@ -23,8 +24,6 @@ class ARActivity : AppCompatActivity() {
     private lateinit var sceneView: ArSceneView
     private lateinit var placeButton: ExtendedFloatingActionButton
     private lateinit var modelNode: ArModelNode
-//    private lateinit var videoNode: VideoNode
-//    private lateinit var mediaPlayer: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,12 +31,11 @@ class ARActivity : AppCompatActivity() {
 
         // Link the Toolbar
         val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar) // Set as the ActionBar
+        setSupportActionBar(toolbar)
 
-        // Initialize AR scene view
-        sceneView = findViewById<ArSceneView>(R.id.sceneView).apply {
-            this.lightEstimationMode = Config.LightEstimationMode.DISABLED
-        }
+        // Access sceneView and set lightEstimationMode
+        sceneView = findViewById(R.id.sceneView)
+        sceneView.lightEstimationMode = Config.LightEstimationMode.DISABLED
 
         // Initialize the place button
         placeButton = findViewById(R.id.place)
@@ -45,29 +43,33 @@ class ARActivity : AppCompatActivity() {
             placeModel()
         }
 
-//        // Setup the video node
-//        videoNode = VideoNode(sceneView.engine, scaleToUnits = 0.7f, centerOrigin = Position(y = -4f), glbFileLocation = "assets/models/earth.glb", player = mediaPlayer, onLoaded = { _, _ ->
-//            mediaPlayer.start()
-//        })
+        // Get the user's score from the Intent
+        val overallScore = intent.getIntExtra("overallScore", 0)
 
-        // Setup the AR model node
+        // Choose the planet based on the score
+        val planetModel = when {
+            overallScore >= 30 -> "models/saturn.glb" // Load Moon for score >= 30
+            overallScore >= 20 -> "models/sun.glb" // Load Venus for score >= 20
+            overallScore >= 10 -> "models/moon.glb"   // Load Sun for score >= 10
+            else -> "models/earth.glb"             // Default to Earth if no other conditions are met
+        }
+
+        // Setup the AR model node with the selected planet model
         modelNode = ArModelNode(sceneView.engine, PlacementMode.INSTANT).apply {
             loadModelGlbAsync(
-                glbFileLocation = "models/earth.glb",
+                glbFileLocation = planetModel, // Load the appropriate model based on the score
                 scaleToUnits = 1f,
                 centerOrigin = Position(-0.5f)
             ) {
                 sceneView.planeRenderer.isVisible = true
-                val materialInstance = it.materialInstances[0]
             }
             onAnchorChanged = {
                 placeButton.isGone = it != null
             }
         }
 
-        // Add model and video nodes to the scene
+        // Add model to the scene
         sceneView.addChild(modelNode)
-//        modelNode.addChild(videoNode)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -94,14 +96,4 @@ class ARActivity : AppCompatActivity() {
         modelNode.anchor()
         sceneView.planeRenderer.isVisible = false
     }
-
-//    override fun onPause() {
-//        super.onPause()
-//        mediaPlayer.stop()
-//    }
-//
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        mediaPlayer.release()
-//    }
 }
