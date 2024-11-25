@@ -1,8 +1,10 @@
 package au.edu.jcu.spacequizapp.main
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import au.edu.jcu.spacequizapp.databinding.FragmentQuizBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,10 +24,11 @@ class QuizFragment : Fragment() {
     private var quizId: Int? = null
     private lateinit var binding: FragmentQuizBinding
     private lateinit var questionDao: QuestionDao
-    private var score = 0
-    private var overall_score = 0
+    private var score = 0 // Local score for this quiz
     private lateinit var scoreTextView: TextView
-    private lateinit var submitButton: Button // Your submit button
+    private lateinit var submitButton: Button
+
+    private var quizCompletionListener: QuizCompletionListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,12 +46,21 @@ class QuizFragment : Fragment() {
 
         quizId?.let { loadQuestions(it) }
 
-        submitButton = binding.submitButton // Ensure the submit button exists in your layout XML
+        submitButton = binding.submitButton
         submitButton.setOnClickListener {
             onSubmit()
         }
 
-        scoreTextView = binding.scoreTextView // Ensure this is defined in your layout XML
+        scoreTextView = binding.scoreTextView
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is QuizCompletionListener) {
+            quizCompletionListener = context
+        } else {
+            throw RuntimeException("$context must implement QuizCompletionListener")
+        }
     }
 
     private fun loadQuestions(quizId: Int) {
@@ -69,7 +82,7 @@ class QuizFragment : Fragment() {
                 Button(requireContext()).apply { text = question.correctAnswer },
                 Button(requireContext()).apply { text = question.optionTwo },
                 Button(requireContext()).apply { text = question.optionThree }
-            ).shuffled() // Shuffle the answers
+            ).shuffled()
 
             binding.questionContainer.apply {
                 addView(questionView)
@@ -84,10 +97,9 @@ class QuizFragment : Fragment() {
     }
 
     private fun handleAnswerClick(button: Button, correctAnswer: String) {
-        if (button.isEnabled) { // Prevent re-clicking
+        if (button.isEnabled) {
             if (button.text == correctAnswer) {
                 score += 1
-                overall_score += 1
                 Toast.makeText(requireContext(), "Correct!", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(requireContext(), "Try again!", Toast.LENGTH_SHORT).show()
@@ -102,21 +114,18 @@ class QuizFragment : Fragment() {
     }
 
     private fun onSubmit() {
+        // Notify parent activity with the score
+        quizCompletionListener?.onQuizCompleted(score)
 
-        // Create and show the popup with the updated score
         AlertDialog.Builder(requireContext())
             .setTitle("Quiz Completed!")
-            .setMessage("Your overall score is: $overall_score")
+            .setMessage("You scored: $score")
             .setPositiveButton("OK") { _, _ ->
-                // Pass the updated score to QuizActivity
-                val quizIntent = Intent(requireContext(), QuizActivity::class.java)
-                quizIntent.putExtra("overallScore", overall_score)
-                startActivity(quizIntent)
+                parentFragmentManager.popBackStack() // Return to parent activity
             }
-            .setCancelable(false)  // Prevent dialog from being dismissed with back button
+            .setCancelable(false)
             .show()
     }
-
 
     companion object {
         private const val ARG_QUIZ_ID = "quiz_id"
@@ -125,4 +134,9 @@ class QuizFragment : Fragment() {
             arguments = Bundle().apply { putInt(ARG_QUIZ_ID, quizId) }
         }
     }
+
+    interface QuizCompletionListener {
+        fun onQuizCompleted(score: Int)
+    }
 }
+

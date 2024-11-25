@@ -35,11 +35,14 @@
 
     <TextView
         android:id="@+id/userScoreTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Your User Score: 0"
+        android:text="Overall Score: 0"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@android:color/holo_purple"
+        android:paddingBottom="6dp"/>
 
     <Spinner
         android:id="@+id/quizSpinner"
@@ -47,6 +50,17 @@
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
         android:padding="10dp"/>
+
+    <TextView
+        android:id="@+id/quizCompletionNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose a new quiz or go to AR View!"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:textColor="@android:color/holo_purple"
+        android:visibility="gone"
+        android:paddingTop="10dp" />
 
     <ScrollView
         android:layout_width="match_parent"
