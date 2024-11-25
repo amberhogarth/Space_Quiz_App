@@ -5,24 +5,12 @@
     android:orientation="vertical"
     android:background="@color/blue_purple">
 
-
-    <TextView
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="AR View"
-        android:textColor="#FFFFFF"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:padding="24dp"/>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Click to go to AR View"
-        android:padding="10dp"
-
-        />
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/dark_blue_purple"
+        android:titleTextColor="@android:color/white" />
 
     <TextView
         android:layout_width="match_parent"

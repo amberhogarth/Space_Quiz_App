@@ -13,7 +13,7 @@
         android:theme="@style/Theme.SpaceQuizApp"
         tools:targetApi="31">
         <activity
-            android:name=".needed.MainActivity"
+            android:name=".main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,7 +21,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".needed.QuizActivity" />
+        <activity android:name=".main.QuizActivity" />
+        <activity android:name=".main.ARActivity" />
     </application>
 
 </manifest>

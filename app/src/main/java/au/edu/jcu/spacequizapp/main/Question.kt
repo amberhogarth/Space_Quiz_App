@@ -1,4 +1,4 @@
-package au.edu.jcu.spacequizapp.needed
+package au.edu.jcu.spacequizapp.main
 
 import androidx.room.Entity
 import androidx.room.ForeignKey

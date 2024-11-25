@@ -1,4 +1,4 @@
-package au.edu.jcu.spacequizapp.needed
+package au.edu.jcu.spacequizapp.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,7 +8,6 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import au.edu.jcu.spacequizapp.R
 import au.edu.jcu.spacequizapp.databinding.FragmentQuizBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

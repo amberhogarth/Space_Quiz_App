@@ -1,4 +1,4 @@
-package au.edu.jcu.spacequizapp.needed
+package au.edu.jcu.spacequizapp.main
 
 import androidx.room.Dao
 import androidx.room.Insert
