@@ -9,12 +9,9 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.ar.core.Config
 import io.github.sceneview.ar.ArSceneView
 import io.github.sceneview.ar.node.ArModelNode
-import io.github.sceneview.node.VideoNode
 import io.github.sceneview.math.Position
-import android.media.MediaPlayer
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import au.edu.jcu.spacequizapp.R
 import io.github.sceneview.ar.node.PlacementMode

@@ -1,15 +1,21 @@
 package au.edu.jcu.spacequizapp.main
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.children
 import androidx.fragment.app.Fragment
+import au.edu.jcu.spacequizapp.R
 import au.edu.jcu.spacequizapp.databinding.FragmentQuizBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -69,6 +75,7 @@ class QuizFragment : Fragment() {
         }
     }
 
+    @SuppressLint("InflateParams")
     private fun displayQuestions(questions: List<Question>) {
         CoroutineScope(Dispatchers.IO).launch {
             val db = AppDatabase.getDatabase(requireContext())
@@ -77,58 +84,103 @@ class QuizFragment : Fragment() {
             withContext(Dispatchers.Main) {
                 val isCompleted = quiz.completed
 
-                // Clear the question container to avoid duplication
+                // Update the quiz overlay visibility
+                val overlay = binding.root.findViewById<View>(R.id.quizOverlay)
+                val content = binding.root.findViewById<LinearLayout>(R.id.quizContent)
+
+                if (isCompleted) {
+                    overlay.visibility = View.VISIBLE
+                    content.alpha = 0.5f // Dim the content
+                } else {
+                    overlay.visibility = View.GONE
+                    content.alpha = 1f // Normal opacity
+                }
+
+                // Clear the question container before adding new questions
                 binding.questionContainer.removeAllViews()
 
                 for (question in questions) {
+                    // Question text view
                     val questionView = TextView(requireContext()).apply {
+                        id = View.generateViewId()
                         text = question.questionText
+                        setTextColor(Color.WHITE)
+                        textSize = 18f
+                        setPadding(0, 16, 0, 16)
+                        gravity = Gravity.CENTER_HORIZONTAL
                     }
+                    binding.questionContainer.addView(questionView)
 
+                    // Buttons for the options
                     val optionButtons = listOf(
-                        Button(requireContext()).apply { text = question.correctAnswer },
-                        Button(requireContext()).apply { text = question.optionTwo },
-                        Button(requireContext()).apply { text = question.optionThree }
-                    ).shuffled()
+                        layoutInflater.inflate(R.layout.item_quiz_button, null) as Button,
+                        layoutInflater.inflate(R.layout.item_quiz_button, null) as Button,
+                        layoutInflater.inflate(R.layout.item_quiz_button, null) as Button
+                    ).apply {
+                        this[0].text = question.correctAnswer
+                        this[1].text = question.optionTwo
+                        this[2].text = question.optionThree
+                    }.shuffled()
 
-                    binding.questionContainer.apply {
-                        addView(questionView)
-                        optionButtons.forEach { button ->
-                            addView(button)
-                            button.isEnabled = !isCompleted // Disable buttons for completed quizzes
-                            if (!isCompleted) {
-                                button.setOnClickListener {
-                                    handleAnswerClick(button, question.correctAnswer)
-                                }
-                            }
+                    // Set up each button's behavior
+                    optionButtons.forEach { button ->
+                        button.isEnabled = !isCompleted // Disable if quiz is completed
+                        button.setOnClickListener {
+                            handleAnswerClick(button, question.correctAnswer, optionButtons)
                         }
+                        binding.questionContainer.addView(button)
                     }
+
+                    // Spacer between questions
+                    val spacerView = View(requireContext()).apply {
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            32 // Height of the spacer
+                        )
+                    }
+                    binding.questionContainer.addView(spacerView)
                 }
 
-                // Disable the Submit button if the quiz is completed
-                submitButton.isEnabled = !isCompleted
-
-                // Show a toast message if the quiz is view-only
                 if (isCompleted) {
-                    Toast.makeText(requireContext(), "Quiz is view-only. You scored 10/10!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "This quiz is completed and view-only.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
     }
 
-
-    private fun handleAnswerClick(button: Button, correctAnswer: String) {
+    private fun handleAnswerClick(button: Button, correctAnswer: String, optionButtons: List<Button>) {
         if (button.isEnabled) {
+            // Check if the answer is correct
             if (button.text == correctAnswer) {
                 score += 1
+                button.setBackgroundColor(Color.parseColor("#4CAF50")) // Green for correct
                 Toast.makeText(requireContext(), "Correct!", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(requireContext(), "Try again!", Toast.LENGTH_SHORT).show()
+                button.setBackgroundColor(Color.parseColor("#F44336")) // Red for incorrect
+                Toast.makeText(requireContext(), "Incorrect!", Toast.LENGTH_SHORT).show()
             }
-            button.isEnabled = false
+
+            // Disable all buttons for this question
+            optionButtons.forEach { btn ->
+                btn.isEnabled = false
+                btn.alpha = 0.5f // Dim all buttons
+            }
+
+            // Find the question text view within the parent container
+            val questionGroup = button.parent as? LinearLayout
+            val questionTextView = questionGroup?.getChildAt(0) as? TextView
+            questionTextView?.alpha = 0.5f // Dim the question text
+
             updateScoreDisplay()
         }
     }
+
+
+
 
     private fun updateScoreDisplay() {
         "Score: $score".also { scoreTextView.text = it }

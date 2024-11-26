@@ -2,14 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="@color/blue_purple">
+    android:background="#604890">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/white" />
+        android:background="@android:color/white"
+        app:titleTextColor="@android:color/holo_purple"
+        android:logo="@drawable/picture2"
+        android:title="@string/astro_adventure"
+        />
 
     <TextView
         android:layout_width="match_parent"
@@ -40,7 +45,7 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:textColor="@android:color/holo_purple"
+        android:textColor="#FFFFFF"
         android:paddingBottom="6dp"/>
 
     <Spinner
@@ -48,7 +53,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
-        android:padding="10dp"/>
+        android:padding="10dp"
+        android:spinnerMode="dropdown"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -60,7 +66,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:backgroundTint="@android:color/white"/>
+            android:background="#604890"/>
 
     </ScrollView>
 

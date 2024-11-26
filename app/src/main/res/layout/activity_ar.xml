@@ -20,7 +20,9 @@
         android:background="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleTextColor="@android:color/holo_purple"
+        android:title="@string/astro_adventure"/>
 
     <!-- Place Button for the AR model -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
