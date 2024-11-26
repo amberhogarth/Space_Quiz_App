@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Space Quiz App</string>
+    <string name="score_0">Score: 0</string>
+    <string name="submit">Submit</string>
+    <string name="quizzes">Quizzes</string>
+    <string name="unlock_planets_by_completing_quizzes_here">Unlock planets by completing quizzes here!</string>
+    <string name="overall_score_0">Overall Score: 0</string>
+    <string name="place">Place</string>
 </resources>
