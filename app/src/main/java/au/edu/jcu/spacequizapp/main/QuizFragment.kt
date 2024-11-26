@@ -1,10 +1,7 @@
 package au.edu.jcu.spacequizapp.main
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +10,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import au.edu.jcu.spacequizapp.databinding.FragmentQuizBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +34,7 @@ class QuizFragment : Fragment() {
         return binding.root
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         quizId = arguments?.getInt(ARG_QUIZ_ID)
@@ -73,28 +70,52 @@ class QuizFragment : Fragment() {
     }
 
     private fun displayQuestions(questions: List<Question>) {
-        for (question in questions) {
-            val questionView = TextView(requireContext()).apply {
-                text = question.questionText
-            }
+        CoroutineScope(Dispatchers.IO).launch {
+            val db = AppDatabase.getDatabase(requireContext())
+            val quiz = db.quizDao().getQuizById(quizId ?: 0)
 
-            val optionButtons = listOf(
-                Button(requireContext()).apply { text = question.correctAnswer },
-                Button(requireContext()).apply { text = question.optionTwo },
-                Button(requireContext()).apply { text = question.optionThree }
-            ).shuffled()
+            withContext(Dispatchers.Main) {
+                val isCompleted = quiz.completed
 
-            binding.questionContainer.apply {
-                addView(questionView)
-                optionButtons.forEach { button ->
-                    addView(button)
-                    button.setOnClickListener {
-                        handleAnswerClick(button, question.correctAnswer)
+                // Clear the question container to avoid duplication
+                binding.questionContainer.removeAllViews()
+
+                for (question in questions) {
+                    val questionView = TextView(requireContext()).apply {
+                        text = question.questionText
                     }
+
+                    val optionButtons = listOf(
+                        Button(requireContext()).apply { text = question.correctAnswer },
+                        Button(requireContext()).apply { text = question.optionTwo },
+                        Button(requireContext()).apply { text = question.optionThree }
+                    ).shuffled()
+
+                    binding.questionContainer.apply {
+                        addView(questionView)
+                        optionButtons.forEach { button ->
+                            addView(button)
+                            button.isEnabled = !isCompleted // Disable buttons for completed quizzes
+                            if (!isCompleted) {
+                                button.setOnClickListener {
+                                    handleAnswerClick(button, question.correctAnswer)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Disable the Submit button if the quiz is completed
+                submitButton.isEnabled = !isCompleted
+
+                // Show a toast message if the quiz is view-only
+                if (isCompleted) {
+                    Toast.makeText(requireContext(), "Quiz is view-only. You scored 10/10!", Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
+
 
     private fun handleAnswerClick(button: Button, correctAnswer: String) {
         if (button.isEnabled) {
@@ -110,22 +131,32 @@ class QuizFragment : Fragment() {
     }
 
     private fun updateScoreDisplay() {
-        scoreTextView.text = "Score: $score"
+        "Score: $score".also { scoreTextView.text = it }
     }
 
     private fun onSubmit() {
-        // Notify parent activity with the score
         quizCompletionListener?.onQuizCompleted(score)
 
         AlertDialog.Builder(requireContext())
             .setTitle("Quiz Completed!")
-            .setMessage("You scored: $score")
+            .setMessage("Your score is: $score")
             .setPositiveButton("OK") { _, _ ->
-                parentFragmentManager.popBackStack() // Return to parent activity
+                if (score == 10) {
+                    quizId?.let { id ->
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val db = AppDatabase.getDatabase(requireContext())
+                            db.quizDao().updateQuizCompletionStatus(id, true)
+                        }
+                    }
+                }
+                activity?.let {
+                    (it as QuizActivity).binding.quizSpinner.setSelection(0)
+                }
             }
             .setCancelable(false)
             .show()
     }
+
 
     companion object {
         private const val ARG_QUIZ_ID = "quiz_id"

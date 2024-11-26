@@ -1,19 +1,13 @@
 package au.edu.jcu.spacequizapp.main
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Button
-import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import au.edu.jcu.spacequizapp.R
 import au.edu.jcu.spacequizapp.databinding.ActivityQuizBinding
 import kotlinx.coroutines.CoroutineScope
@@ -22,9 +16,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class QuizActivity : AppCompatActivity(), QuizFragment.QuizCompletionListener {
-    private lateinit var binding: ActivityQuizBinding
+    lateinit var binding: ActivityQuizBinding
     private lateinit var quizDao: QuizDao
     private var overallScore: Int = 0 // Track overall score
+    private var selectedQuizId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +31,7 @@ class QuizActivity : AppCompatActivity(), QuizFragment.QuizCompletionListener {
             .getInt("overallScore", 0)
 
         // Display the initial score
-        binding.userScoreTextView.text = "Overall Score: $overallScore"
+        "Overall Score: $overallScore".also { binding.userScoreTextView.text = it }
 
         val db = AppDatabase.getDatabase(this)
         quizDao = db.quizDao()
@@ -54,7 +49,9 @@ class QuizActivity : AppCompatActivity(), QuizFragment.QuizCompletionListener {
     }
 
     private fun setupQuizSpinner(quizzes: List<Quiz>) {
-        val quizTitles = quizzes.map { it.title }
+        val quizTitles = quizzes.map {
+            if (it.completed) "${it.title} (Completed)" else it.title
+        }
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, quizTitles)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.quizSpinner.adapter = adapter
@@ -66,14 +63,16 @@ class QuizActivity : AppCompatActivity(), QuizFragment.QuizCompletionListener {
                 position: Int,
                 id: Long
             ) {
-                binding.quizCompletionNote.visibility = View.GONE // Hide the note
                 val selectedQuiz = quizzes[position]
+                selectedQuizId = selectedQuiz.quizId // Track selected quiz ID
                 displayQuizQuestions(selectedQuiz)
             }
 
             override fun onNothingSelected(parentView: AdapterView<*>?) {}
         }
     }
+
+
 
     private fun displayQuizQuestions(quiz: Quiz) {
         val fragment = QuizFragment.newInstance(quiz.quizId)
@@ -93,20 +92,29 @@ class QuizActivity : AppCompatActivity(), QuizFragment.QuizCompletionListener {
             .apply()
 
         // Dynamically update the UI
-        binding.userScoreTextView.text = "Overall Score: $overallScore"
+        "Overall Score: $overallScore".also { binding.userScoreTextView.text = it }
     }
 
     override fun onQuizCompleted(score: Int) {
         addToOverallScore(score)
-        // Show the note to encourage selecting a new quiz
-        binding.quizCompletionNote.visibility = View.VISIBLE
 
-        // Reload quizzes to refresh spinner options
         CoroutineScope(Dispatchers.IO).launch {
-            val quizzes = quizDao.getAllQuizzes()
+            // Mark the selected quiz as completed if the score is 10/10
+            selectedQuizId?.let { quizId ->
+                if (score == 10) {
+                    quizDao.updateQuizCompletionStatus(quizId, true)
+                }
+            }
+
+            // Reload quizzes to update the spinner
+            val updatedQuizzes = quizDao.getAllQuizzes()
             withContext(Dispatchers.Main) {
-                setupQuizSpinner(quizzes)
-    }}}
+                setupQuizSpinner(updatedQuizzes)
+
+            }
+        }
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
